@@ -11,9 +11,9 @@ import (
 )
 
 type Commit struct {
-	Files   []*File
-	Hash    string
-	Message string
+	Files   []*File `json:"files"`
+	Hash    string  `json:"hash"`
+	Message string  `json:"message"`
 }
 
 func (c *Commit) processFile(gitFile *object.File) error {
@@ -51,47 +51,4 @@ func (c *Commit) processFile(gitFile *object.File) error {
 	}
 
 	return nil
-}
-
-type File struct {
-	Functions []*Function
-	Path      string
-}
-
-func (f *File) processFunction(declFunc *ast.FuncDecl) {
-	function := &Function{
-		Arity: declFunc.Type.Params.NumFields(),
-		Name:  declFunc.Name.String(),
-	}
-
-	f.Functions = append(f.Functions, function)
-}
-
-type Function struct {
-	Arity      int
-	Complexity int
-	Lines      int
-	Name       string
-	Panics     int
-}
-
-type Repo struct {
-	Commits []*Commit
-}
-
-func (r *Repo) processCommit(gitCommit *object.Commit) error {
-	commit := &Commit{
-		Hash:    gitCommit.Hash.String(),
-		Message: gitCommit.Message,
-	}
-
-	r.Commits = append(r.Commits, commit)
-
-	tree, err := gitCommit.Tree()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to retrieve tree")
-		return err
-	}
-
-	return tree.Files().ForEach(commit.processFile)
 }
