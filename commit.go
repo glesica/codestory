@@ -40,6 +40,9 @@ func (c *Commit) processFile(gitFile *object.File) error {
 
 	astFile, err := parser.ParseFile(fileSet, gitFile.Name, contents, 0)
 	if err != nil {
+		// TODO: Handle syntax errors gracefully
+		// Failed to build AST
+		// cmd/bindingsTranspiler/testAssets/testFailingGoCode.go:5:31: expected ';', found '{'
 		fmt.Fprintln(os.Stderr, "Failed to build AST")
 		return err
 	}
