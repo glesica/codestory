@@ -9,12 +9,12 @@ type complexityVisitor struct {
 	value int
 }
 
-func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
-	switch n := n.(type) {
+func (v *complexityVisitor) Visit(node ast.Node) ast.Visitor {
+	switch node := node.(type) {
 	case *ast.CaseClause, *ast.CommClause, *ast.ForStmt, *ast.FuncDecl, *ast.IfStmt, *ast.RangeStmt:
 		v.value++
 	case *ast.BinaryExpr:
-		if n.Op == token.LAND || n.Op == token.LOR {
+		if node.Op == token.LAND || node.Op == token.LOR {
 			v.value++
 		}
 	}
