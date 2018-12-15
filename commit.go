@@ -45,8 +45,8 @@ func (c *Commit) processFile(gitFile *object.File) error {
 	}
 
 	for _, decl := range astFile.Decls {
-		if declFunc, ok := decl.(*ast.FuncDecl); ok {
-			file.processFunction(declFunc)
+		if funcDecl, ok := decl.(*ast.FuncDecl); ok {
+			file.processFunction(funcDecl, fileSet)
 		}
 	}
 
