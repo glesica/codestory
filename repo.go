@@ -7,17 +7,16 @@ import (
 )
 
 type Repo struct {
-	Commits       []*Commit `json:"commits"`
-	lastGitCommit *object.Commit
+	Commits []*Commit `json:"commits"`
 }
 
-func (r *Repo) processCommit(gitCommit *object.Commit) error {
+func (r *Repo) processCommit(gitCommit, nextGitCommit *object.Commit) error {
 	// Update the last commit container with additions and deletions
-	if r.lastGitCommit != nil {
+	if nextGitCommit != nil {
 		additions := 0
 		deletions := 0
 
-		patch, err := gitCommit.Patch(r.lastGitCommit)
+		patch, err := gitCommit.Patch(nextGitCommit)
 		if err != nil {
 			return err
 		}
@@ -30,7 +29,7 @@ func (r *Repo) processCommit(gitCommit *object.Commit) error {
 		lastCommit.Additions = additions
 		lastCommit.Deletions = deletions
 	}
-	r.lastGitCommit = gitCommit
+	nextGitCommit = gitCommit
 
 	commit := &Commit{
 		Author:  gitCommit.Author.Name,

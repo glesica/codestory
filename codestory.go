@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"os"
 )
 
@@ -35,7 +36,12 @@ func main() {
 
 	repo := Repo{}
 
-	err = commitIter.ForEach(repo.processCommit)
+	var nextCommit *object.Commit
+	err = commitIter.ForEach(func(commit *object.Commit) error {
+		err := repo.processCommit(commit, nextCommit)
+		nextCommit = commit
+		return err
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
