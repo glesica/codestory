@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"os"
 )
 
@@ -23,6 +22,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	// TODO: Figure out how the iterator will handle merge commits
 	logOptions := &git.LogOptions{
 		From:  gitHead.Hash(),
 		Order: git.LogOrderCommitterTime,
@@ -36,12 +36,7 @@ func main() {
 
 	repo := Repo{}
 
-	var nextCommit *object.Commit
-	err = commitIter.ForEach(func(commit *object.Commit) error {
-		err := repo.processCommit(commit, nextCommit)
-		nextCommit = commit
-		return err
-	})
+	err = commitIter.ForEach(repo.processCommit)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)

@@ -26,7 +26,7 @@ func (c *Commit) processFile(gitFile *object.File) error {
 		return nil
 	}
 
-	if strings.HasPrefix(gitFile.Name, "vendor") {
+	if strings.HasPrefix(gitFile.Name, "vendor/") {
 		return nil
 	}
 
