@@ -14,9 +14,11 @@ func FunctionName(decl *ast.FuncDecl) string {
 	return name + decl.Name.Name
 }
 
+// FunctionLength computes and returns the length, in lines, of a
+// function, excluding comments.
 func FunctionLength(decl *ast.FuncDecl, fileSet *token.FileSet) int {
-	pos := fileSet.Position(decl.Pos())
-	end := fileSet.Position(decl.End())
+	pos := fileSet.PositionFor(decl.Pos(), false)
+	end := fileSet.PositionFor(decl.End(), false)
 
 	return end.Line - pos.Line
 }

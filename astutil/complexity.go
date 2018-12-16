@@ -21,6 +21,8 @@ func (v *complexityVisitor) Visit(node ast.Node) ast.Visitor {
 	return v
 }
 
+// FunctionComplexity computes and returns the cyclomatic complexity
+// of the given function.
 func FunctionComplexity(decl *ast.FuncDecl) int {
 	visitor := complexityVisitor{}
 	ast.Walk(&visitor, decl)
