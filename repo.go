@@ -7,14 +7,17 @@ import (
 )
 
 type Repo struct {
-	Commits []*Commit `json:"commits"`
+	Commits       []*Commit `json:"commits"`
+	lastGitCommit *object.Commit
 }
 
-func (r *Repo) processCommit(gitCommit *object.Commit, prevGitCommit *object.Commit) error {
-	additions := 0
-	deletions := 0
-	if prevGitCommit != nil {
-		patch, err := prevGitCommit.Patch(gitCommit)
+func (r *Repo) processCommit(gitCommit *object.Commit) error {
+	// Update the last commit container with additions and deletions
+	if r.lastGitCommit != nil {
+		additions := 0
+		deletions := 0
+
+		patch, err := gitCommit.Patch(r.lastGitCommit)
 		if err != nil {
 			return err
 		}
@@ -22,15 +25,19 @@ func (r *Repo) processCommit(gitCommit *object.Commit, prevGitCommit *object.Com
 			additions = additions + stat.Addition
 			deletions = deletions + stat.Deletion
 		}
+
+		lastCommit := r.Commits[len(r.Commits)-1]
+		lastCommit.Additions = additions
+		lastCommit.Deletions = deletions
 	}
+	r.lastGitCommit = gitCommit
+
 	commit := &Commit{
-		Additions: additions,
-		Author:    gitCommit.Author.Name,
-		Deletions: deletions,
-		Email:     gitCommit.Author.Email,
-		Epoch:     gitCommit.Author.When.Unix(),
-		Hash:      gitCommit.Hash.String(),
-		Message:   gitCommit.Message,
+		Author:  gitCommit.Author.Name,
+		Email:   gitCommit.Author.Email,
+		Epoch:   gitCommit.Author.When.Unix(),
+		Hash:    gitCommit.Hash.String(),
+		Message: gitCommit.Message,
 	}
 
 	r.Commits = append(r.Commits, commit)

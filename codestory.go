@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"os"
 )
 
@@ -23,7 +22,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	commitIter, err := gitRepo.Log(&git.LogOptions{From: gitHead.Hash()})
+	logOptions := &git.LogOptions{
+		From:  gitHead.Hash(),
+		Order: git.LogOrderCommitterTime,
+	}
+	commitIter, err := gitRepo.Log(logOptions)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to retrieve log")
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -32,12 +35,7 @@ func main() {
 
 	repo := Repo{}
 
-	var prevCommit *object.Commit
-	err = commitIter.ForEach(func(commit *object.Commit) error {
-		err := repo.processCommit(commit, prevCommit)
-		prevCommit = commit
-		return err
-	})
+	err = commitIter.ForEach(repo.processCommit)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
