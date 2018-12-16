@@ -10,10 +10,27 @@ type Repo struct {
 	Commits []*Commit `json:"commits"`
 }
 
-func (r *Repo) processCommit(gitCommit *object.Commit) error {
+func (r *Repo) processCommit(gitCommit *object.Commit, prevGitCommit *object.Commit) error {
+	additions := 0
+	deletions := 0
+	if prevGitCommit != nil {
+		patch, err := prevGitCommit.Patch(gitCommit)
+		if err != nil {
+			return err
+		}
+		for _, stat := range patch.Stats() {
+			additions = additions + stat.Addition
+			deletions = deletions + stat.Deletion
+		}
+	}
 	commit := &Commit{
-		Hash:    gitCommit.Hash.String(),
-		Message: gitCommit.Message,
+		Additions: additions,
+		Author:    gitCommit.Author.Name,
+		Deletions: deletions,
+		Email:     gitCommit.Author.Email,
+		Epoch:     gitCommit.Author.When.Unix(),
+		Hash:      gitCommit.Hash.String(),
+		Message:   gitCommit.Message,
 	}
 
 	r.Commits = append(r.Commits, commit)

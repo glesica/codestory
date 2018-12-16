@@ -11,9 +11,14 @@ import (
 )
 
 type Commit struct {
-	Files   []*File `json:"files"`
-	Hash    string  `json:"hash"`
-	Message string  `json:"message"`
+	Additions int     `json:"additions"`
+	Author    string  `json:"author"`
+	Deletions int     `json:"deletions"`
+	Email     string  `json:"email"`
+	Epoch     int64   `json:"epoch"`
+	Files     []*File `json:"files"`
+	Hash      string  `json:"hash"`
+	Message   string  `json:"message"`
 }
 
 func (c *Commit) processFile(gitFile *object.File) error {
