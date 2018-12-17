@@ -9,7 +9,7 @@ import (
 func FunctionName(decl *ast.FuncDecl) string {
 	name := ""
 	if decl.Recv != nil && decl.Recv.NumFields() > 0 {
-		name = name + "." + ReceiverName(decl.Recv.List[0].Type)
+		name = name + "(" + ReceiverName(decl.Recv.List[0].Type) + ")" + "."
 	}
 	return name + decl.Name.Name
 }
