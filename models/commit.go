@@ -11,17 +11,21 @@ import (
 )
 
 type Commit struct {
-	Additions int     `json:"additions"`
-	Author    string  `json:"author"`
-	Deletions int     `json:"deletions"`
-	Email     string  `json:"email"`
-	Epoch     int64   `json:"epoch"`
-	Files     []*File `json:"files"`
-	Hash      string  `json:"hash"`
-	Message   string  `json:"message"`
+	Additions int             `json:"additions"`
+	Author    string          `json:"author"`
+	Deletions int             `json:"deletions"`
+	Email     string          `json:"email"`
+	Epoch     int64           `json:"epoch"`
+	Hash      string          `json:"hash"`
+	Message   string          `json:"message"`
+	Pkgs      map[string]*Pkg `json:"packages"`
 }
 
 func (c *Commit) processFile(gitFile *object.File) error {
+	if c.Pkgs == nil {
+		c.Pkgs = make(map[string]*Pkg)
+	}
+
 	if !strings.HasSuffix(gitFile.Name, ".go") {
 		return nil
 	}
@@ -29,12 +33,6 @@ func (c *Commit) processFile(gitFile *object.File) error {
 	if strings.HasPrefix(gitFile.Name, "vendor/") {
 		return nil
 	}
-
-	file := &File{
-		Path: gitFile.Name,
-	}
-
-	c.Files = append(c.Files, file)
 
 	fileSet := token.NewFileSet()
 	contents, err := gitFile.Contents()
@@ -52,9 +50,19 @@ func (c *Commit) processFile(gitFile *object.File) error {
 		return err
 	}
 
+	pkgName := astFile.Name.Name
+
+	pkg, ok := c.Pkgs[pkgName]
+	if !ok {
+		pkg = &Pkg{
+			Name: pkgName,
+		}
+		c.Pkgs[pkgName] = pkg
+	}
+
 	for _, decl := range astFile.Decls {
 		if funcDecl, ok := decl.(*ast.FuncDecl); ok {
-			file.processFunction(funcDecl, fileSet)
+			pkg.processFunction(funcDecl, gitFile.Name, fileSet)
 		}
 	}
 
