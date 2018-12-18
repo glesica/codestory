@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ type Repo struct {
 	Commits []*Commit `json:"commits"`
 }
 
-func (r *Repo) processCommit(gitCommit *object.Commit) error {
+func (r *Repo) ProcessCommit(gitCommit *object.Commit) error {
 	additions := 0
 	deletions := 0
 	hasParent := false

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/glesica/codestory/models"
 	"gopkg.in/src-d/go-git.v4"
 	"os"
 )
@@ -34,9 +35,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	repo := Repo{}
+	repo := models.Repo{}
 
-	err = commitIter.ForEach(repo.processCommit)
+	err = commitIter.ForEach(repo.ProcessCommit)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
