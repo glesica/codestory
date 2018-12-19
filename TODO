@@ -1,0 +1,7 @@
+1. Decide what data we want to capture
+  - Variables for functions
+    - Size of the last commit that changed it
+  - Date / time of the commit
+2. Persistence
+  - Think about data model
+3. We include functions but we don't limit it to functions that changed
